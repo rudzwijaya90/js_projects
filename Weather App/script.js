@@ -10,6 +10,8 @@ const searchBtn = document.querySelector(".search button");
 
 const weatherIcon = document.querySelector(".weather-icon");
 
+let weatherInterval;
+
 async function checkWeather(city) {
     const response = await fetch(apiUrl + city + `&appid=${apiKey}`);
 
@@ -43,6 +45,23 @@ async function checkWeather(city) {
 
 }
 
-searchBtn.addEventListener("click", ()=>{
-    checkWeather(searchBox.value); //give city name being input in searchbox
-})
+// Function to start refreshing weather data every 30 seconds
+const startWeatherRefresh = () => {
+    clearInterval(weatherInterval); // Clear any existing interval
+    weatherInterval = setInterval(() => {
+        checkWeather(searchBox.value); // Refresh weather data
+    }, 30000); // 30 seconds
+};
+
+// Event listeners for search button and Enter key
+searchBox.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        checkWeather(searchBox.value);
+        startWeatherRefresh(); // Start refreshing after checking
+    }
+});
+
+searchBtn.addEventListener("click", () => {
+    checkWeather(searchBox.value);
+    startWeatherRefresh(); // Start refreshing after checking
+});
